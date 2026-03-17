@@ -1,0 +1,49 @@
+<view class="container">
+  <view class="form-section">
+    <view class="section-title">还款信息</view>
+
+    <view class="form-item">
+      <view class="form-label">剩余欠款</view>
+      <view class="remain-amount">¥{{remainAmount}}</view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">还款金额 <text class="required">*</text></view>
+      <input class="form-input" type="digit" placeholder="请输入还款金额" value="{{formData.amount}}" bindinput="onInputChange" data-field="amount" />
+      <view class="quick-btn" wx:if="{{remainAmount > 0}}" bindtap="quickPay">
+        全部还清
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">还款时间 <text class="required">*</text></view>
+      <picker mode="date" value="{{formData.repaymentDate}}" bindchange="onDateChange">
+        <view class="picker-value">
+          {{formData.repaymentDate || '请选择日期'}}
+        </view>
+      </picker>
+      <picker mode="time" value="{{formData.repaymentTime}}" bindchange="onTimeChange">
+        <view class="picker-value">
+          {{formData.repaymentTime || '请选择时间'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">操作人</view>
+      <input class="form-input" type="text" placeholder="请输入操作人" value="{{formData.operator}}" bindinput="onInputChange" data-field="operator" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">备注</view>
+      <textarea class="form-textarea" placeholder="请输入备注信息" value="{{formData.remark}}" bindinput="onInputChange" data-field="remark" maxlength="500"></textarea>
+      <view class="textarea-count">{{formData.remark.length}}/500</view>
+    </view>
+  </view>
+
+  <view class="form-footer">
+    <button class="submit-btn" bindtap="handleSubmit" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : '确认还款'}}
+    </button>
+  </view>
+</view>

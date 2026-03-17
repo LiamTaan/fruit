@@ -1,0 +1,77 @@
+<view class="container">
+  <view class="period-tabs">
+    <view class="period-tab {{currentPeriod === 'today' ? 'active' : ''}}" bindtap="onPeriodChange" data-period="today">
+      今日
+    </view>
+    <view class="period-tab {{currentPeriod === 'month' ? 'active' : ''}}" bindtap="onPeriodChange" data-period="month">
+      本月
+    </view>
+    <view class="period-tab {{currentPeriod === 'year' ? 'active' : ''}}" bindtap="onPeriodChange" data-period="year">
+      全年
+    </view>
+  </view>
+
+  <view class="stats-card" wx:if="{{stats}}">
+    <view class="card-title">总览数据</view>
+
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-label">入库金额</view>
+        <view class="stat-value primary">{{displayStats.inboundAmount}}</view>
+        <view class="stat-sub">入库{{displayStats.inboundCount}}笔</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-label">出库金额</view>
+        <view class="stat-value success">{{displayStats.outboundAmount}}</view>
+        <view class="stat-sub">出库{{displayStats.outboundCount}}笔</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-label">利润</view>
+        <view class="stat-value warning">{{displayStats.profit}}</view>
+        <view class="stat-sub">纯利润</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-label">欠款金额</view>
+        <view class="stat-value danger">{{displayStats.debtAmount}}</view>
+        <view class="stat-sub">新增{{displayStats.debtCount}}笔</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="total-debt-card" wx:if="{{stats}}">
+    <view class="debt-icon">💰</view>
+    <view class="debt-info">
+        <view class="debt-label">待收欠款总额</view>
+        <view class="debt-amount">{{displayStats.totalUnpaidDebt}}</view>
+      </view>
+  </view>
+
+  <view class="rank-card" wx:if="{{stats && stats.productSaleRanks && stats.productSaleRanks.length > 0}}">
+    <view class="card-title">商品销量排行</view>
+    <view class="rank-list">
+      <view wx:for="{{stats.productSaleRanks}}" wx:key="productId" class="rank-item">
+        <view class="rank-number {{index < 3 ? 'top' : ''}}">{{index + 1}}</view>
+        <view class="rank-info">
+          <view class="product-name">{{item.productName}}</view>
+          <view class="product-spec" wx:if="{{item.variety || item.grade}}">
+            {{item.variety}} {{item.grade}}
+          </view>
+        </view>
+        <view class="rank-stats">
+          <view class="stat-line">
+            <text class="stat-label">销量：</text>
+            <text class="stat-value">{{item.totalWeight}}</text>
+          </view>
+          <view class="stat-line">
+            <text class="stat-label">金额：</text>
+            <text class="stat-value primary">¥{{item.totalAmount}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{stats && (!stats.productSaleRanks || stats.productSaleRanks.length === 0)}}">
+    暂无销售数据
+  </view>
+</view>

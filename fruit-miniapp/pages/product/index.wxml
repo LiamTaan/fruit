@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <input class="search-input" type="text" placeholder="搜索果品名称/品种" value="{{keyword}}" bindinput="onKeywordInput" />
+      <view class="search-icon">🔍</view>
+    </view>
+  </view>
+
+  <view class="product-list">
+    <view wx:if="{{productList.length === 0 && !loading}}" class="empty-tip">
+      暂无果品数据
+    </view>
+
+    <view wx:for="{{productList}}" wx:key="id" class="product-item card" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="product-header flex-between">
+        <view class="product-name">{{item.name}}</view>
+      </view>
+      <view class="product-info">
+        <view class="info-row" wx:if="{{item.variety}}">
+          <text class="info-label">品种：</text>
+          <text class="info-value">{{item.variety}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.grade}}">
+          <text class="info-label">等级：</text>
+          <text class="info-value">{{item.grade}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">单位：</text>
+          <text class="info-value">{{item.unit}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">创建时间：</text>
+          <text class="info-value text-secondary">{{item.createTime}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{hasMore}}">
+    <view wx:if="{{loading}}" class="loading-text">加载中...</view>
+    <view wx:else class="load-text" bindtap="loadMore">加载更多</view>
+  </view>
+
+  <view class="fab" bindtap="goToAdd">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

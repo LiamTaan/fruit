@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="form-section">
+    <view class="section-title">果品信息</view>
+
+    <view class="form-item">
+      <view class="form-label">果品名称 <text class="required">*</text></view>
+      <input class="form-input" type="text" placeholder="请输入果品名称" value="{{formData.name}}" bindinput="onInputChange" data-field="name" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">品种</view>
+      <input class="form-input" type="text" placeholder="请输入品种" value="{{formData.variety}}" bindinput="onInputChange" data-field="variety" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">等级</view>
+      <input class="form-input" type="text" placeholder="请输入等级" value="{{formData.grade}}" bindinput="onInputChange" data-field="grade" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">单位</view>
+      <picker mode="selector" range="{{unitOptions}}" value="{{unitIndex}}" bindchange="onUnitChange">
+        <view class="picker-value">
+          {{formData.unit || '请选择单位'}}
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="form-footer">
+    <button class="submit-btn" bindtap="handleSubmit" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : (isEdit ? '保存修改' : '创建果品')}}
+    </button>
+  </view>
+</view>

@@ -1,0 +1,62 @@
+<view class="container" wx:if="{{order}}">
+  <view class="info-card card">
+    <view class="info-header">
+      <view class="order-no">{{order.orderNo}}</view>
+      <view class="order-status">已完成</view>
+    </view>
+
+    <view class="info-body">
+      <view class="info-row">
+        <view class="info-label">果品名称</view>
+        <view class="info-value">{{order.productName}}</view>
+      </view>
+      <view class="info-row" wx:if="{{order.variety}}">
+        <view class="info-label">品种</view>
+        <view class="info-value">{{order.variety}}</view>
+      </view>
+      <view class="info-row" wx:if="{{order.grade}}">
+        <view class="info-label">等级</view>
+        <view class="info-value">{{order.grade}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">重量</view>
+        <view class="info-value">{{order.weight}}{{order.unit}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">单价</view>
+        <view class="info-value">¥{{order.unitPrice}}/{{order.unit}}</view>
+      </view>
+      <view class="info-row total">
+        <view class="info-label">总金额</view>
+        <view class="info-value text-danger">¥{{order.totalAmount}}</view>
+      </view>
+      <view class="info-row" wx:if="{{order.origin}}">
+        <view class="info-label">产地</view>
+        <view class="info-value">{{order.origin}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">入库时间</view>
+        <view class="info-value">{{order.inboundTime}}</view>
+      </view>
+      <view class="info-row" wx:if="{{order.operator}}">
+        <view class="info-label">入库人</view>
+        <view class="info-value">{{order.operator}}</view>
+      </view>
+      <view class="info-row" wx:if="{{order.remark}}">
+        <view class="info-label">备注</view>
+        <view class="info-value">{{order.remark}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">创建时间</view>
+        <view class="info-value">{{order.createdAt}}</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view class="action-bar" wx:if="{{order}}">
+  <view class="action-btn delete" bindtap="deleteOrder">
+    <text class="action-icon">🗑️</text>
+    <text class="action-text">删除</text>
+  </view>
+</view>

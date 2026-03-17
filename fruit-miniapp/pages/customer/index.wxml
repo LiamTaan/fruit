@@ -1,0 +1,67 @@
+<view class="container">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <input class="search-input" type="text" placeholder="搜索客户姓名/电话" value="{{keyword}}" bindinput="onKeywordInput" />
+      <view class="search-icon">🔍</view>
+    </view>
+  </view>
+
+  <view class="filter-bar">
+    <view class="filter-item {{currentCategory === '' ? 'active' : ''}}" bindtap="onCategoryChange" data-category="">
+      全部
+    </view>
+    <view class="filter-item {{currentCategory === '1' ? 'active' : ''}}" bindtap="onCategoryChange" data-category="1">
+      优质
+    </view>
+    <view class="filter-item {{currentCategory === '2' ? 'active' : ''}}" bindtap="onCategoryChange" data-category="2">
+      一般
+    </view>
+    <view class="filter-item {{currentCategory === '3' ? 'active' : ''}}" bindtap="onCategoryChange" data-category="3">
+      欠款
+    </view>
+  </view>
+
+  <view class="customer-list">
+    <view wx:if="{{customerList.length === 0 && !loading}}" class="empty-tip">
+      暂无客户数据
+    </view>
+
+    <view wx:for="{{customerList}}" wx:key="id" class="customer-item card" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="customer-header flex-between">
+        <view class="customer-name">{{item.name}}</view>
+        <view class="customer-category category-{{item.category}}">
+          {{item.categoryName}}
+        </view>
+      </view>
+      <view class="customer-info">
+        <view class="info-row">
+          <text class="info-label">📱</text>
+          <text class="info-value">{{item.phone || '未填写'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">📍</text>
+          <text class="info-value">{{item.address || '未填写'}}</text>
+        </view>
+      </view>
+      <view class="customer-stats flex-between">
+        <view class="stat-item">
+          <view class="stat-label">总交易</view>
+          <view class="stat-value">¥{{item.totalAmount}}</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-label">欠款</view>
+          <view class="stat-value {{item.debtAmount > 0 ? 'text-danger' : ''}}">¥{{item.debtAmount}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{hasMore}}">
+    <view wx:if="{{loading}}" class="loading-text">加载中...</view>
+    <view wx:else class="load-text" bindtap="loadMore">加载更多</view>
+  </view>
+
+  <view class="fab" bindtap="goToAdd">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

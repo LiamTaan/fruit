@@ -1,0 +1,86 @@
+<view class="container">
+  <view class="header">
+    <view class="header-left" bindtap="navigateBack">
+      <text class="back-icon">←</text>
+    </view>
+    <view class="header-title">使用帮助</view>
+    <view class="header-right"></view>
+  </view>
+  
+  <view class="help-container">
+    <view class="help-section">
+      <view class="section-title">常见问题</view>
+      
+      <view class="faq-list">
+        <!-- FAQ项1 -->
+        <view class="faq-item">
+          <view class="faq-question" bindtap="toggleFaq" data-index="0">
+            <text class="question-text">如何添加新客户？</text>
+            <text class="question-arrow">{{expanded[0] ? '▼' : '▶'}}</text>
+          </view>
+          <view class="faq-answer" wx:if="{{expanded[0]}}">
+            <text>在客户管理页面，点击右上角的"添加"按钮，填写客户信息并保存即可。</text>
+          </view>
+        </view>
+        
+        <!-- FAQ项2 -->
+        <view class="faq-item">
+          <view class="faq-question" bindtap="toggleFaq" data-index="1">
+            <text class="question-text">如何记录产品入库？</text>
+            <text class="question-arrow">{{expanded[1] ? '▼' : '▶'}}</text>
+          </view>
+          <view class="faq-answer" wx:if="{{expanded[1]}}">
+            <text>在入库管理页面，点击"新增入库单"，选择产品并填写入库数量，确认后提交即可。</text>
+          </view>
+        </view>
+        
+        <!-- FAQ项3 -->
+        <view class="faq-item">
+          <view class="faq-question" bindtap="toggleFaq" data-index="2">
+            <text class="question-text">如何查看库存统计？</text>
+            <text class="question-arrow">{{expanded[2] ? '▼' : '▶'}}</text>
+          </view>
+          <view class="faq-answer" wx:if="{{expanded[2]}}">
+            <text>在库存管理页面，可以查看所有产品的当前库存情况，包括库存数量、单位等信息。</text>
+          </view>
+        </view>
+        
+        <!-- FAQ项4 -->
+        <view class="faq-item">
+          <view class="faq-question" bindtap="toggleFaq" data-index="3">
+            <text class="question-text">如何生成销售统计报表？</text>
+            <text class="question-arrow">{{expanded[3] ? '▼' : '▶'}}</text>
+          </view>
+          <view class="faq-answer" wx:if="{{expanded[3]}}">
+            <text>在统计分析页面，选择相应的时间范围和产品，系统会自动生成销售统计报表，包括销售额、销量等数据。</text>
+          </view>
+        </view>
+        
+        <!-- FAQ项5 -->
+        <view class="faq-item">
+          <view class="faq-question" bindtap="toggleFaq" data-index="4">
+            <text class="question-text">如何修改登录密码？</text>
+            <text class="question-arrow">{{expanded[4] ? '▼' : '▶'}}</text>
+          </view>
+          <view class="faq-answer" wx:if="{{expanded[4]}}">
+            <text>在"我的"页面，点击"修改密码"，输入原密码和新密码，确认后即可完成密码修改。</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="help-section">
+      <view class="section-title">联系我们</view>
+      <view class="contact-info">
+        <view class="contact-item">
+          <text class="contact-label">客服电话：</text>
+          <text class="contact-value">400-123-4567</text>
+        </view>
+        <view class="contact-item">
+          <text class="contact-label">邮箱：</text>
+          <text class="contact-value">support@example.com</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

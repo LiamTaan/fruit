@@ -1,0 +1,55 @@
+<view class="container">
+  <view class="form-section">
+    <view class="section-title">基本信息</view>
+
+    <view class="form-item avatar-item">
+      <view class="form-label">客户头像</view>
+      <view class="avatar-uploader">
+        <image class="avatar-img" src="{{formData.avatar || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}}" mode="aspectFill" bindtap="chooseAvatar"></image>
+        <view class="avatar-uploader-text">点击修改头像</view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">客户姓名 <text class="required">*</text></view>
+      <input class="form-input" type="text" placeholder="请输入客户姓名" value="{{formData.name}}" bindinput="onInputChange" data-field="name" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">联系电话</view>
+      <input class="form-input" type="number" placeholder="请输入联系电话" value="{{formData.phone}}" bindinput="onInputChange" data-field="phone" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">地址</view>
+      <input class="form-input" type="text" placeholder="请输入地址" value="{{formData.address}}" bindinput="onInputChange" data-field="address" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">客户分类</view>
+      <view class="category-selector">
+        <view class="category-option {{formData.category === 1 ? 'active' : ''}}" bindtap="onCategorySelect" data-category="1">
+          优质客户
+        </view>
+        <view class="category-option {{formData.category === 2 ? 'active' : ''}}" bindtap="onCategorySelect" data-category="2">
+          一般客户
+        </view>
+        <view class="category-option {{formData.category === 3 ? 'active' : ''}}" bindtap="onCategorySelect" data-category="3">
+          欠款客户
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">备注</view>
+      <textarea class="form-textarea" placeholder="请输入备注信息" value="{{formData.remark}}" bindinput="onInputChange" data-field="remark" maxlength="500"></textarea>
+      <view class="textarea-count">{{formData.remark.length}}/500</view>
+    </view>
+  </view>
+
+  <view class="form-footer">
+    <button class="submit-btn" bindtap="handleSubmit" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : (isEdit ? '保存修改' : '创建客户')}}
+    </button>
+  </view>
+</view>

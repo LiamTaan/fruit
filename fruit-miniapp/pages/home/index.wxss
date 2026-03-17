@@ -1,0 +1,159 @@
+.stats-card {
+  margin-bottom: 16px;
+}
+
+.stats-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 16px;
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #07c160;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #999999;
+}
+
+.quick-actions {
+  margin-bottom: 16px;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.action-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.action-label {
+  font-size: 14px;
+  color: #333333;
+}
+
+.monthly-stats {
+  margin-bottom: 16px;
+}
+
+.monthly-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.monthly-item:last-child {
+  border-bottom: none;
+}
+
+.monthly-label {
+  font-size: 14px;
+  color: #666666;
+}
+
+.monthly-value {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.recent-orders {
+  margin-bottom: 16px;
+}
+
+.card-header {
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.card-more {
+  font-size: 12px;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 40px 0;
+  color: #999999;
+  font-size: 14px;
+}
+
+.order-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-header {
+  margin-bottom: 8px;
+}
+
+.order-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.order-type.inbound {
+  background-color: #07c160;
+}
+
+.order-type.outbound {
+  background-color: #1989fa;
+}
+
+.order-time {
+  font-size: 12px;
+}
+
+.order-product {
+  font-size: 14px;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+.order-amount {
+  font-size: 14px;
+  color: #666666;
+}
+
+.debt-tag {
+  color: #fa5151;
+  font-size: 12px;
+  margin-left: 4px;
+}

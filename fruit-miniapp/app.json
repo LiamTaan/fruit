@@ -1,0 +1,65 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/home/index",
+    "pages/customer/index",
+    "pages/customer/form",
+    "pages/customer/detail",
+    "pages/product/index",
+    "pages/product/form",
+    "pages/product/detail",
+    "pages/inbound/index",
+    "pages/inbound/form",
+    "pages/inbound/detail",
+    "pages/stock/index",
+    "pages/stock/detail",
+    "pages/outbound/index",
+    "pages/outbound/form",
+    "pages/outbound/detail",
+    "pages/debt/index",
+    "pages/debt/detail",
+    "pages/debt/repayment",
+    "pages/statistics/index",
+    "pages/mine/index",
+    "pages/mine/change-password",
+    "pages/mine/help"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#07c160",
+    "navigationBarTitleText": "运城果业",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#07c160",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/inbound/index",
+        "text": "入库"
+      },
+      {
+        "pagePath": "pages/outbound/index",
+        "text": "出库"
+      },
+      {
+        "pagePath": "pages/statistics/index",
+        "text": "统计"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {}
+}

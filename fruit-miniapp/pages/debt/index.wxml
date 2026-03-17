@@ -1,0 +1,63 @@
+<view class="container">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <input class="search-input" type="text" placeholder="搜索客户/单号" value="{{keyword}}" bindinput="onKeywordInput" />
+      <view class="search-icon">🔍</view>
+    </view>
+  </view>
+
+  <view class="filter-bar">
+    <view class="filter-item {{currentStatus === '' ? 'active' : ''}}" bindtap="onFilterChange" data-status="">
+      全部
+    </view>
+    <view class="filter-item {{currentStatus === '1' ? 'active' : ''}}" bindtap="onFilterChange" data-status="1">
+      未结清
+    </view>
+    <view class="filter-item {{currentStatus === '2' ? 'active' : ''}}" bindtap="onFilterChange" data-status="2">
+      已结清
+    </view>
+  </view>
+
+  <view class="debt-list">
+    <view wx:if="{{debtList.length === 0 && !loading}}" class="empty-tip">
+      暂无欠款记录
+    </view>
+
+    <view wx:for="{{debtList}}" wx:key="id" class="debt-item card" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="debt-header flex-between">
+        <view class="debt-no">{{item.debtNo}}</view>
+        <view class="status-badge {{item.status === 1 ? 'unpaid' : 'paid'}}">
+          {{item.statusName}}
+        </view>
+      </view>
+      <view class="debt-body">
+        <view class="customer-name">{{item.customerName}}</view>
+        <view class="debt-stats">
+          <view class="stat-item">
+            <text class="stat-label">欠款总额</text>
+            <text class="stat-value total">¥{{item.totalAmount}}</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">已还</text>
+            <text class="stat-value paid">¥{{item.paidAmount}}</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">剩余</text>
+            <text class="stat-value remain {{(item.remainingAmount && item.remainingAmount > 0) ? 'red' : ''}}">¥{{item.remainingAmount || 0}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="debt-footer">
+        <view class="footer-item">
+          <text class="footer-label">欠款时间：</text>
+          <text class="footer-value">{{item.dueDate || item.createTime}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{hasMore}}">
+    <view wx:if="{{loading}}" class="loading-text">加载中...</view>
+    <view wx:else class="load-text" bindtap="loadMore">加载更多</view>
+  </view>
+</view>

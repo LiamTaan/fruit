@@ -1,0 +1,88 @@
+<view class="container">
+  <view class="form-section">
+    <view class="section-title">出库信息</view>
+
+    <view class="form-item">
+      <view class="form-label">选择客户 <text class="required">*</text></view>
+      <picker bindchange="onCustomerChange" value="{{customerIndex}}" range="{{customerList}}" range-key="name">
+        <view class="picker-value">
+          {{selectedCustomer ? selectedCustomer.name : '请选择客户'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">选择果品 <text class="required">*</text></view>
+      <picker bindchange="onProductChange" value="{{productIndex}}" range="{{productList}}" range-key="name">
+        <view class="picker-value">
+          {{selectedProduct ? selectedProduct.name : '请选择果品'}}
+        </view>
+      </picker>
+      <view class="product-spec" wx:if="{{selectedProduct}}">
+        <text wx:if="{{selectedProduct.variety}}">{{selectedProduct.variety}}</text>
+        <text wx:if="{{selectedProduct.grade}}"> / {{selectedProduct.grade}}</text>
+        <text wx:if="{{selectedProduct.unit}}"> ({{selectedProduct.unit}})</text>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">重量 <text class="required">*</text></view>
+      <input class="form-input" type="digit" placeholder="请输入重量" value="{{formData.weight}}" bindinput="onInputChange" data-field="weight" />
+      <view class="unit-tag" wx:if="{{selectedProduct}}">{{selectedProduct.unit}}</view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">单价 <text class="required">*</text></view>
+      <input class="form-input" type="digit" placeholder="请输入单价" value="{{formData.unitPrice}}" bindinput="onInputChange" data-field="unitPrice" />
+      <view class="unit-tag">元/{{selectedProduct ? selectedProduct.unit : 'kg'}}</view>
+    </view>
+
+    <view class="total-section">
+      <view class="total-label">总金额</view>
+      <view class="total-value">¥{{totalAmount}}</view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">收款方式 <text class="required">*</text></view>
+      <view class="payment-selector">
+        <view class="payment-option {{formData.paymentType === 1 ? 'active' : ''}}" bindtap="onPaymentSelect" data-type="1">
+          现款
+        </view>
+        <view class="payment-option {{formData.paymentType === 2 ? 'active' : ''}}" bindtap="onPaymentSelect" data-type="2">
+          欠款
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">出库时间 <text class="required">*</text></view>
+      <picker mode="date" value="{{formData.outboundDate}}" bindchange="onDateChange">
+        <view class="picker-value">
+          {{formData.outboundDate || '请选择日期'}}
+        </view>
+      </picker>
+      <picker mode="time" value="{{formData.outboundTime}}" bindchange="onTimeChange">
+        <view class="picker-value">
+          {{formData.outboundTime || '请选择时间'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">操作人</view>
+      <input class="form-input" type="text" placeholder="请输入操作人" value="{{formData.operator}}" bindinput="onInputChange" data-field="operator" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">备注</view>
+      <textarea class="form-textarea" placeholder="请输入备注信息" value="{{formData.remark}}" bindinput="onInputChange" data-field="remark" maxlength="500"></textarea>
+      <view class="textarea-count">{{formData.remark.length}}/500</view>
+    </view>
+  </view>
+
+  <view class="form-footer">
+    <button class="submit-btn" bindtap="handleSubmit" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : '创建出库单'}}
+    </button>
+  </view>
+</view>

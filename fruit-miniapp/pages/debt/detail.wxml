@@ -1,0 +1,48 @@
+<view class="container" wx:if="{{debt}}">
+  <view class="info-card card">
+    <view class="info-header">
+      <view class="debt-no">{{debt.debtNo}}</view>
+      <view class="status-badge {{debt.status === 1 ? 'unpaid' : 'paid'}}">
+        {{debt.statusName}}
+      </view>
+    </view>
+
+    <view class="info-body">
+      <view class="info-row">
+        <view class="info-label">客户</view>
+        <view class="info-value">{{debt.customerName}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">欠款总额</view>
+        <view class="info-value text-danger">¥{{debt.totalAmount}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">已还款</view>
+        <view class="info-value text-primary">¥{{debt.paidAmount || 0}}</view>
+      </view>
+      <view class="info-row highlight">
+        <view class="info-label">剩余欠款</view>
+        <view class="info-value text-danger-large">¥{{debt.remainingAmount || 0}}</view>
+      </view>
+      <view class="info-row" wx:if="{{debt.remark}}">
+        <view class="info-label">欠款原因</view>
+        <view class="info-value">{{debt.remark}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">欠款时间</view>
+        <view class="info-value">{{debt.dueDate || debt.createTime}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">创建时间</view>
+        <view class="info-value">{{debt.createTime}}</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view class="action-bar" wx:if="{{debt && debt.status === 1}}">
+  <view class="action-btn primary" bindtap="goToRepayment">
+    <text class="action-icon">💰</text>
+    <text class="action-text">还款</text>
+  </view>
+</view>

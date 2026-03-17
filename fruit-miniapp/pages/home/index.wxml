@@ -1,0 +1,98 @@
+<view class="container">
+  <view class="stats-card card">
+    <view class="stats-title">今日数据</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-value">¥{{todayData.inbound || 0}}</view>
+        <view class="stat-label">今日入库</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">¥{{todayData.outbound || 0}}</view>
+        <view class="stat-label">今日出库</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value text-danger">¥{{todayData.debt || 0}}</view>
+        <view class="stat-label">今日欠款</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-actions card">
+    <view class="action-grid">
+      <view class="action-item" bindtap="goToInbound">
+        <view class="action-icon">📥</view>
+        <view class="action-label">入库开单</view>
+      </view>
+      <view class="action-item" bindtap="goToOutbound">
+        <view class="action-icon">📤</view>
+        <view class="action-label">出库开单</view>
+      </view>
+      <view class="action-item" bindtap="goToDebt">
+        <view class="action-icon">💰</view>
+        <view class="action-label">欠款管理</view>
+      </view>
+      <view class="action-item" bindtap="goToInventory">
+        <view class="action-icon">📦</view>
+        <view class="action-label">库存查看</view>
+      </view>
+      <view class="action-item" bindtap="goToCustomer">
+        <view class="action-icon">👥</view>
+        <view class="action-label">客户管理</view>
+      </view>
+      <view class="action-item" bindtap="goToProduct">
+        <view class="action-icon">🍎</view>
+        <view class="action-label">产品管理</view>
+      </view>
+      <view class="action-item" bindtap="goToStatistics">
+        <view class="action-icon">📊</view>
+        <view class="action-label">统计报表</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="monthly-stats card">
+    <view class="stats-title">本月统计</view>
+    <view class="monthly-item">
+      <view class="monthly-label">本月营收</view>
+      <view class="monthly-value text-primary">¥{{monthlyData.revenue || 0}}</view>
+    </view>
+    <view class="monthly-item">
+      <view class="monthly-label">本月利润</view>
+      <view class="monthly-value text-primary">¥{{monthlyData.profit || 0}}</view>
+    </view>
+    <view class="monthly-item">
+      <view class="monthly-label">待收欠款</view>
+      <view class="monthly-value text-danger">¥{{monthlyData.pendingDebt || 0}}</view>
+    </view>
+  </view>
+
+  <view class="recent-orders card">
+    <view class="card-header flex-between">
+      <view class="card-title">最近单据</view>
+      <view class="card-more text-secondary" bindtap="goToAllOrders">查看全部 ></view>
+    </view>
+    <view class="order-list">
+      <view wx:if="{{recentOrders.length === 0}}" class="empty-tip">
+        暂无单据
+      </view>
+      <view wx:for="{{recentOrders}}" wx:key="id" class="order-item">
+        <view class="order-header flex-between">
+          <view class="order-type {{item.type === 'inbound' ? 'inbound' : 'outbound'}}">
+            {{item.type === 'inbound' ? '入库' : '出库'}}
+          </view>
+          <view class="order-time text-secondary">{{item.time}}</view>
+        </view>
+        <view class="order-content">
+          <view class="order-product">{{item.product}}</view>
+          <view class="order-amount flex-between">
+            <view>{{item.weight}}kg</view>
+            <view class="{{item.type === 'outbound' && item.isDebt ? 'text-danger' : ''}}">
+              ¥{{item.amount}}
+              <text wx:if="{{item.type === 'outbound' && item.isDebt}}" class="debt-tag">[欠款]</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

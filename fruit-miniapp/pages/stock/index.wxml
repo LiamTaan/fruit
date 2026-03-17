@@ -1,0 +1,59 @@
+<view class="container">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <input class="search-input" type="text" placeholder="搜索果品名称/品种" value="{{keyword}}" bindinput="onKeywordInput" />
+      <view class="search-icon">🔍</view>
+    </view>
+  </view>
+
+  <view class="filter-bar">
+    <view class="filter-item {{!showLowStock ? 'active' : ''}}" bindtap="onFilterChange" data-low-stock="{{false}}">
+      全部
+    </view>
+    <view class="filter-item {{showLowStock ? 'active' : ''}}" bindtap="onFilterChange" data-low-stock="{{true}}">
+      库存预警
+    </view>
+  </view>
+
+  <view class="stock-list">
+    <view wx:if="{{stockList.length === 0 && !loading}}" class="empty-tip">
+      暂无库存数据
+    </view>
+
+    <view wx:for="{{stockList}}" wx:key="id" class="stock-item card {{item.isWarning ? 'low-stock' : ''}}" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="stock-header flex-between">
+        <view class="product-name">{{item.productName}}</view>
+        <view class="stock-badge" wx:if="{{item.isWarning}}">
+          库存不足
+        </view>
+      </view>
+      <view class="product-spec" wx:if="{{item.variety || item.grade}}">
+        <text wx:if="{{item.variety}}">{{item.variety}}</text>
+        <text wx:if="{{item.grade}}"> / {{item.grade}}</text>
+      </view>
+      <view class="stock-info">
+        <view class="info-item">
+          <text class="info-label">当前库存</text>
+          <text class="info-value">{{item.quantity}}{{item.unit}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">平均成本</text>
+          <text class="info-value">¥{{item.avgCostPrice}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">总成本</text>
+          <text class="info-value">¥{{item.totalCost}}</text>
+        </view>
+      </view>
+      <view class="stock-footer" wx:if="{{item.warningThreshold}}">
+        <text class="warning-label">预警阈值：</text>
+        <text class="warning-value">{{item.warningThreshold}}{{item.unit}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{hasMore}}">
+    <view wx:if="{{loading}}" class="loading-text">加载中...</view>
+    <view wx:else class="load-text" bindtap="loadMore">加载更多</view>
+  </view>
+</view>

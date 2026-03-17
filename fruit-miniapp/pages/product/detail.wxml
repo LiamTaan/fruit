@@ -1,0 +1,61 @@
+<view class="container" wx:if="{{product}}">
+  <view class="info-card card">
+    <view class="info-header">
+      <view class="product-icon">🍎</view>
+      <view class="info-basic">
+        <view class="product-name">{{product.name}}</view>
+        <view class="product-status {{!product.disabled ? 'active' : ''}} clickable" bindtap="toggleStatus">
+          {{product.disabled ? '禁用' : '启用'}}
+        </view>
+      </view>
+    </view>
+
+    <view class="info-body">
+      <view class="info-row">
+        <view class="info-label">品种</view>
+        <view class="info-value">{{product.variety || '未填写'}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">等级</view>
+        <view class="info-value">{{product.grade || '未填写'}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">单位</view>
+        <view class="info-value">{{product.unit}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">创建时间</view>
+        <view class="info-value">{{product.createdAt}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="info-card card" wx:if="{{product}}">
+    <view class="info-header">
+      <view class="section-title">库存信息</view>
+    </view>
+    <view class="info-body">
+      <view class="info-row">
+        <view class="info-label">当前库存</view>
+        <view class="info-value">{{product.stock || 0}} {{product.unit}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">库存状态</view>
+        <view class="info-value {{product.stock > 0 ? 'stock-available' : 'stock-unavailable'}}">
+          {{product.stock > 0 ? '有库存' : '无库存'}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view class="action-bar" wx:if="{{product}}">
+  <view class="action-btn" bindtap="editProduct">
+    <text class="action-icon">✏️</text>
+    <text class="action-text">编辑</text>
+  </view>
+  <view class="action-btn delete" bindtap="deleteProduct">
+    <text class="action-icon">🗑️</text>
+    <text class="action-text">删除</text>
+  </view>
+</view>

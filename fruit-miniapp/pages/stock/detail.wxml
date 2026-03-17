@@ -1,0 +1,48 @@
+<view class="container" wx:if="{{stock}}">
+  <view class="info-card card">
+    <view class="info-header">
+      <view class="product-icon">🍎</view>
+      <view class="info-basic">
+        <view class="product-name">{{stock.productName}}</view>
+        <view class="stock-badge" wx:if="{{stock.isLowStock}}">
+          库存不足
+        </view>
+      </view>
+    </view>
+
+    <view class="info-body">
+      <view class="info-row" wx:if="{{stock.variety}}">
+        <view class="info-label">品种</view>
+        <view class="info-value">{{stock.variety}}</view>
+      </view>
+      <view class="info-row" wx:if="{{stock.grade}}">
+        <view class="info-label">等级</view>
+        <view class="info-value">{{stock.grade}}</view>
+      </view>
+      <view class="info-row highlight">
+        <view class="info-label">当前库存</view>
+        <view class="info-value text-primary">{{stock.quantity}}{{stock.unit}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">平均成本价</view>
+        <view class="info-value">¥{{stock.avgCostPrice}}/{{stock.unit}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">总成本</view>
+        <view class="info-value">¥{{stock.totalCost}}</view>
+      </view>
+      <view class="info-row" wx:if="{{stock.warningThreshold}}">
+        <view class="info-label">预警阈值</view>
+        <view class="info-value text-danger">{{stock.warningThreshold}}{{stock.unit}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">更新时间</view>
+        <view class="info-value">{{stock.updateTime}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip">
+    <text>入库/出库记录功能开发中...</text>
+  </view>
+</view>

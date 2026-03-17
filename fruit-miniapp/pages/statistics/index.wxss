@@ -1,0 +1,209 @@
+.container {
+  padding-bottom: 20px;
+}
+
+.period-tabs {
+  display: flex;
+  background-color: #ffffff;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.period-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #666666;
+  border-radius: 20px;
+  margin: 0 4px;
+}
+
+.period-tab.active {
+  background-color: #07c160;
+  color: #ffffff;
+}
+
+.stats-card {
+  margin: 12px 16px;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #999999;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+.stat-value.primary {
+  color: #1890ff;
+}
+
+.stat-value.success {
+  color: #52c41a;
+}
+
+.stat-value.warning {
+  color: #faad14;
+}
+
+.stat-value.danger {
+  color: #ff4d4f;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: #666666;
+}
+
+.total-debt-card {
+  margin: 0 16px 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.debt-icon {
+  font-size: 40px;
+  margin-right: 12px;
+}
+
+.debt-info {
+  flex: 1;
+}
+
+.debt-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 4px;
+}
+
+.debt-amount {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.rank-card {
+  margin: 0 16px;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+}
+
+.rank-list {
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rank-item:last-child {
+  border-bottom: none;
+}
+
+.rank-number {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  background-color: #f0f0f0;
+  color: #666666;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.rank-number.top {
+  background-color: #07c160;
+  color: #ffffff;
+}
+
+.rank-info {
+  flex: 1;
+  margin-right: 12px;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+.product-spec {
+  font-size: 12px;
+  color: #999999;
+}
+
+.rank-stats {
+  text-align: right;
+}
+
+.stat-line {
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.stat-line:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  color: #999999;
+  margin-right: 4px;
+}
+
+.stat-value {
+  color: #333333;
+  font-weight: bold;
+}
+
+.stat-value.primary {
+  color: #07c160;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 60px 0;
+  color: #999999;
+  font-size: 14px;
+}

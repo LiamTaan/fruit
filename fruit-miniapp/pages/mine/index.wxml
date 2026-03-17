@@ -1,0 +1,55 @@
+<view class="container">
+  <view class="user-card card">
+    <view class="user-info flex">
+      <view class="user-avatar">
+        <image class="avatar-img" src="{{userInfo.avatar || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}}" mode="aspectFill"></image>
+      </view>
+      <view class="user-detail">
+        <view class="user-nickname">{{userInfo.nickname || userInfo.username || '未登录'}}</view>
+        <view class="user-role text-secondary">{{userInfo.role === 1 ? '管理员' : '普通用户'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="menu-list card">
+    <view class="menu-item" bindtap="goToChangePassword">
+      <view class="menu-left flex-center">
+        <view class="menu-icon">🔐</view>
+        <view class="menu-text">修改密码</view>
+      </view>
+      <view class="menu-arrow">></view>
+    </view>
+    <view class="menu-item" bindtap="goToAbout">
+      <view class="menu-left flex-center">
+        <view class="menu-icon">ℹ️</view>
+        <view class="menu-text">关于系统</view>
+      </view>
+      <view class="menu-arrow">></view>
+    </view>
+    <view class="menu-item" bindtap="goToHelp">
+      <view class="menu-left flex-center">
+        <view class="menu-icon">❓</view>
+        <view class="menu-text">使用帮助</view>
+      </view>
+      <view class="menu-arrow">></view>
+    </view>
+  </view>
+
+  <view class="menu-list card" wx:if="{{userInfo}}">
+    <view class="menu-item" bindtap="switchAccount">
+      <view class="menu-left flex-center">
+        <view class="menu-icon">🔄</view>
+        <view class="menu-text">切换账号</view>
+      </view>
+      <view class="menu-arrow">></view>
+    </view>
+  </view>
+
+  <view class="logout-btn" wx:if="{{userInfo}}" bindtap="logout">
+    退出登录
+  </view>
+
+  <view class="login-btn" wx:if="{{!userInfo}}" bindtap="login">
+    立即登录
+  </view>
+</view>

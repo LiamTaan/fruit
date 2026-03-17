@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="login-card">
+    <view class="login-title">运城果业</view>
+    <view class="login-subtitle">记账库存管理系统</view>
+
+    <view class="form-item">
+      <view class="form-label">用户名</view>
+      <input class="form-input" type="text" placeholder="请输入用户名" value="{{username}}" bindinput="onUsernameInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">密码</view>
+      <input class="form-input" type="password" placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" />
+    </view>
+
+    <view class="login-btn" bindtap="handleLogin">
+      {{loading ? '登录中...' : '登录'}}
+    </view>
+  </view>
+</view>
