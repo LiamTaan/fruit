@@ -1,6 +1,7 @@
 package com.fruit.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fruit.common.exception.BusinessException;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -107,8 +110,10 @@ public class UserService {
         Long currentUserId = getCurrentUserId();
         User currentUser = userMapper.selectById(currentUserId);
         
-        // 数据隔离：管理员可以查看自己和自己创建的员工，员工只能查看自己
-        if (currentUser.getRole() == 1) { // 老板（管理员）
+        // 数据隔离：超级管理员（admin）可以查看所有用户
+        if ("admin".equals(currentUser.getUsername())) {
+            // 超级管理员可以查看所有用户，不需要数据隔离
+        } else if (currentUser.getRole() == 1) { // 普通管理员
             wrapper.and(w -> w.eq(User::getId, currentUserId) // 自己
                             .or().eq(User::getParentId, currentUserId)); // 自己创建的员工
         } else { // 员工
@@ -146,14 +151,17 @@ public class UserService {
             throw new BusinessException("用户不存在");
         }
         
-        // 数据安全检查：管理员只能查看自己和自己创建的员工，员工只能查看自己
-        if (currentUser.getRole() == 1) { // 老板（管理员）
-            if (!user.getId().equals(currentUserId) && !user.getParentId().equals(currentUserId)) {
-                throw new BusinessException("无权查看该用户信息");
-            }
-        } else { // 员工
-            if (!user.getId().equals(currentUserId)) {
-                throw new BusinessException("无权查看该用户信息");
+        // 数据安全检查：超级管理员（admin）可以查看所有用户
+        if (!"admin".equals(currentUser.getUsername())) {
+            // 普通管理员只能查看自己和自己创建的员工，员工只能查看自己
+            if (currentUser.getRole() == 1) { // 普通管理员
+                if (!user.getId().equals(currentUserId) && !user.getParentId().equals(currentUserId)) {
+                    throw new BusinessException("无权查看该用户信息");
+                }
+            } else { // 员工
+                if (!user.getId().equals(currentUserId)) {
+                    throw new BusinessException("无权查看该用户信息");
+                }
             }
         }
         
@@ -194,9 +202,50 @@ public class UserService {
         user.setPhone(req.getPhone());
         user.setRole(req.getRole() != null ? req.getRole() : 2); // 默认员工角色
         user.setStatus(req.getStatus() != null ? req.getStatus() : 1); // 默认启用
-        user.setParentId(currentUserId); // 设置上级用户ID为当前用户
+        
+        // 设置上级用户ID
+        Integer role = req.getRole() != null ? req.getRole() : 2;
+        if (role == 1) {
+            // 管理员角色不需要设置上级
+            user.setParentId(null);
+        } else {
+            // 员工角色，使用前端传入的parentId，如果没有传入则使用当前用户ID
+            user.setParentId(req.getParentId() != null ? req.getParentId() : currentUserId);
+        }
         
         userMapper.insert(user);
+    }
+    
+    /**
+     * 获取所有管理员列表
+     * 用于在创建/编辑用户时选择所属管理员
+     */
+    public List<UserInfoResp> listAdmins() {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getRole, 1); // 角色为管理员
+        
+        // 获取当前用户ID
+        Long currentUserId = getCurrentUserId();
+        User currentUser = userMapper.selectById(currentUserId);
+        
+        // 数据隔离：超级管理员可以查看所有管理员，普通管理员只能查看自己
+        if (!"admin".equals(currentUser.getUsername())) {
+            wrapper.eq(User::getId, currentUserId);
+        }
+        
+        wrapper.orderByAsc(User::getCreateTime);
+        
+        List<User> admins = userMapper.selectList(wrapper);
+        
+        return admins.stream().map(admin -> new UserInfoResp(
+            admin.getId(),
+            admin.getUsername(),
+            admin.getNickname(),
+            admin.getPhone(),
+            admin.getRole(),
+            admin.getStatus(),
+            admin.getParentId()
+        )).collect(java.util.stream.Collectors.toList());
     }
 
     public void update(UserUpdateReq req) {
@@ -210,14 +259,16 @@ public class UserService {
             throw new BusinessException("用户不存在");
         }
         
-        // 数据安全检查：管理员只能修改自己和自己创建的员工，员工只能修改自己
-        if (currentUser.getRole() == 1) { // 老板（管理员）
-            if (!user.getId().equals(currentUserId) && !user.getParentId().equals(currentUserId)) {
-                throw new BusinessException("无权修改该用户信息");
-            }
-        } else { // 员工
-            if (!user.getId().equals(currentUserId)) {
-                throw new BusinessException("无权修改该用户信息");
+        // 数据安全检查：超级管理员可以修改所有用户，普通管理员只能修改自己和自己创建的员工，员工只能修改自己
+        if (!"admin".equals(currentUser.getUsername())) {
+            if (currentUser.getRole() == 1) { // 普通管理员
+                if (!user.getId().equals(currentUserId) && !user.getParentId().equals(currentUserId)) {
+                    throw new BusinessException("无权修改该用户信息");
+                }
+            } else { // 员工
+                if (!user.getId().equals(currentUserId)) {
+                    throw new BusinessException("无权修改该用户信息");
+                }
             }
         }
         
@@ -246,21 +297,49 @@ public class UserService {
         if (currentUser.getRole() == 1) {
             user.setRole(req.getRole());
             user.setStatus(req.getStatus());
+            
+            // 创建UpdateWrapper
+            UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("id", user.getId());
+            updateWrapper.set("role", req.getRole());
+            updateWrapper.set("status", req.getStatus());
+            
+            // 如果角色改为管理员，清除所属管理员
+            if (req.getRole() == 1) {
+                updateWrapper.set("parent_id", null);
+            } else if (req.getParentId() != null) {
+                // 只有员工角色可以设置所属管理员
+                updateWrapper.set("parent_id", req.getParentId());
+            }
+            
+            // 更新用户信息
+            userMapper.update(user, updateWrapper);
+        } else {
+            // 如果不是管理员修改，只更新基本信息
+            userMapper.updateById(user);
         }
-        
-        // 只有管理员可以修改parentId，且只能设置为自己
-        if (currentUser.getRole() == 1 && req.getParentId() != null) {
-            user.setParentId(req.getParentId());
-        }
-        
-        userMapper.updateById(user);
     }
 
     public void delete(Long id) {
+        // 获取当前用户ID和角色
+        Long currentUserId = getCurrentUserId();
+        User currentUser = userMapper.selectById(currentUserId);
+        
         // 检查用户是否存在
         User user = userMapper.selectById(id);
         if (user == null) {
             throw new BusinessException("用户不存在");
+        }
+        
+        // 数据安全检查：超级管理员可以删除所有用户，普通管理员只能删除自己创建的员工
+        if (!"admin".equals(currentUser.getUsername())) {
+            if (currentUser.getRole() == 1) { // 普通管理员
+                if (!user.getParentId().equals(currentUserId)) {
+                    throw new BusinessException("无权删除该用户信息");
+                }
+            } else { // 员工
+                throw new BusinessException("员工无权删除用户");
+            }
         }
         
         userMapper.deleteById(id);

@@ -8,9 +8,11 @@ import com.fruit.dto.resp.DebtResp;
 import com.fruit.entity.Customer;
 import com.fruit.entity.Debt;
 import com.fruit.entity.OutboundOrder;
+import com.fruit.entity.User;
 import com.fruit.mapper.CustomerMapper;
 import com.fruit.mapper.DebtMapper;
 import com.fruit.mapper.OutboundOrderMapper;
+import com.fruit.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +29,7 @@ public class DebtService {
     private final DebtMapper debtMapper;
     private final CustomerMapper customerMapper;
     private final OutboundOrderMapper outboundOrderMapper;
+    private final UserMapper userMapper;
 
     private Long getCurrentUserId() {
         return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -36,8 +39,27 @@ public class DebtService {
         Long userId = getCurrentUserId();
         Page<Debt> page = new Page<>(pageNum, pageSize);
         
+        // 获取当前用户信息
+        User currentUser = userMapper.selectById(userId);
+        
         LambdaQueryWrapper<Debt> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Debt::getUserId, userId);
+        
+        // 实现业务数据的隔离：
+        // - 管理员可以看到自己和下属员工的债务
+        // - 员工只能看到自己的债务
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            wrapper.in(Debt::getUserId, userIds);
+        } else { // 员工
+            wrapper.eq(Debt::getUserId, userId); // 只能看到自己的债务
+        }
+        
         if (status != null) {
             wrapper.eq(Debt::getStatus, status);
         }
@@ -97,6 +119,28 @@ public class DebtService {
         if (debt == null) {
             throw new BusinessException("欠款记录不存在");
         }
+        
+        // 数据安全检查
+        Long userId = getCurrentUserId();
+        User currentUser = userMapper.selectById(userId);
+        
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            if (!userIds.contains(debt.getUserId())) {
+                throw new BusinessException("无权查看该欠款记录");
+            }
+        } else { // 员工
+            if (!debt.getUserId().equals(userId)) {
+                throw new BusinessException("无权查看该欠款记录");
+            }
+        }
+        
         return convertToResp(debt);
     }
 

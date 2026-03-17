@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @Api(tags = "用户管理", description = "用户列表查询、用户详情、创建用户、更新用户、删除用户")
 @RestController
@@ -51,8 +52,12 @@ public class UserController {
     }
 
     @ApiOperation("更新用户")
-    @PutMapping
-    public Result<Void> update(@Valid @RequestBody UserUpdateReq req) {
+    @PutMapping("/{id}")
+    public Result<Void> update(@PathVariable(required = false) Long id, @Valid @RequestBody UserUpdateReq req) {
+        // 将路径参数id赋值给请求体中的id字段
+        if (id != null) {
+            req.setId(id);
+        }
         userService.update(req);
         return Result.success();
     }
@@ -62,5 +67,12 @@ public class UserController {
     public Result<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return Result.success();
+    }
+    
+    @ApiOperation("获取管理员列表")
+    @GetMapping("/admins")
+    public Result<List<UserInfoResp>> listAdmins() {
+        List<UserInfoResp> admins = userService.listAdmins();
+        return Result.success(admins);
     }
 }

@@ -25,9 +25,15 @@
         </el-form-item>
         
         <el-form-item label="角色" prop="role">
-          <el-select v-model="userForm.role" placeholder="请选择角色">
+          <el-select v-model="userForm.role" placeholder="请选择角色" @change="handleRoleChange">
             <el-option label="管理员" value="1" />
-            <el-option label="普通用户" value="2" />
+            <el-option label="员工" value="2" />
+          </el-select>
+        </el-form-item>
+        
+        <el-form-item label="所属管理员" prop="parentId">
+          <el-select v-model="userForm.parentId" placeholder="请选择所属管理员" :disabled="userForm.role === '1'">
+            <el-option v-for="admin in adminList" :key="admin.id" :label="admin.nickname || admin.username" :value="admin.id" />
           </el-select>
         </el-form-item>
         
@@ -47,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Check, Close } from '@element-plus/icons-vue'
@@ -64,13 +70,16 @@ const getCurrentUserInfo = () => {
 
 const currentUser = getCurrentUserInfo();
 
+// 管理员列表
+const adminList = ref([])
+
 // 表单数据
 const userForm = reactive({
   username: '',
   nickname: '',
   phone: '',
   password: '',
-  role: '2', // 默认普通用户
+  role: '2', // 默认员工
   parentId: currentUser.id // 自动设置当前用户为上级
 })
 
@@ -96,9 +105,9 @@ const rules = {
     { required: true, message: '请选择角色', trigger: 'change' },
     {
       validator: (rule, value, callback) => {
-        // 普通用户(role=2)无法创建管理员账号
+        // 员工(role=2)无法创建管理员账号
         if (currentUser.role === 2 && value === 1) {
-          callback(new Error('普通用户无法创建管理员账号'));
+          callback(new Error('员工无法创建管理员账号'));
         } else {
           callback();
         }
@@ -126,10 +135,39 @@ const handleSubmit = async () => {
   }
 }
 
+// 处理角色变化
+const handleRoleChange = (value) => {
+  if (value === '1') {
+    // 当角色为管理员时，清空所属管理员字段
+    userForm.parentId = null
+  } else {
+    // 当角色为员工时，如果所属管理员为空，自动设置为当前登录用户
+    if (!userForm.parentId && currentUser.id) {
+      userForm.parentId = currentUser.id
+    }
+  }
+}
+
+// 加载管理员列表
+const loadAdminList = async () => {
+  try {
+    const admins = await userApi.getAdminList()
+    adminList.value = admins
+  } catch (error) {
+    console.error('获取管理员列表失败:', error)
+    ElMessage.error('获取管理员列表失败，请稍后重试')
+  }
+}
+
 // 取消操作
 const handleCancel = () => {
   router.push('/system/user')
 }
+
+// 组件挂载时加载管理员列表
+onMounted(() => {
+  loadAdminList()
+})
 </script>
 
 <style scoped>

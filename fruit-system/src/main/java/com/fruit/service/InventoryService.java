@@ -6,9 +6,11 @@ import com.fruit.dto.resp.InventoryResp;
 import com.fruit.entity.InboundOrder;
 import com.fruit.entity.Inventory;
 import com.fruit.entity.Product;
+import com.fruit.entity.User;
 import com.fruit.mapper.InboundOrderMapper;
 import com.fruit.mapper.InventoryMapper;
 import com.fruit.mapper.ProductMapper;
+import com.fruit.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +27,7 @@ public class InventoryService {
     private final InventoryMapper inventoryMapper;
     private final ProductMapper productMapper;
     private final InboundOrderMapper inboundOrderMapper;
+    private final UserMapper userMapper;
 
     private Long getCurrentUserId() {
         return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -34,8 +37,27 @@ public class InventoryService {
         Long userId = getCurrentUserId();
         Page<Inventory> page = new Page<>(pageNum, pageSize);
         
+        // 获取当前用户信息
+        User currentUser = userMapper.selectById(userId);
+        
         LambdaQueryWrapper<Inventory> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Inventory::getUserId, userId);
+        
+        // 实现业务数据的隔离：
+        // - 管理员可以看到自己和下属员工的库存
+        // - 员工只能看到自己的库存
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            wrapper.in(Inventory::getUserId, userIds);
+        } else { // 员工
+            wrapper.eq(Inventory::getUserId, userId); // 只能看到自己的库存
+        }
+        
         wrapper.orderByDesc(Inventory::getUpdateTime);
         
         Page<Inventory> resultPage = inventoryMapper.selectPage(page, wrapper);
@@ -63,8 +85,28 @@ public class InventoryService {
 
     public List<InventoryResp> getWarningList(String keyword) {
         Long userId = getCurrentUserId();
+        
+        // 获取当前用户信息
+        User currentUser = userMapper.selectById(userId);
+        
         LambdaQueryWrapper<Inventory> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Inventory::getUserId, userId);
+        
+        // 实现业务数据的隔离：
+        // - 管理员可以看到自己和下属员工的库存预警
+        // - 员工只能看到自己的库存预警
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            wrapper.in(Inventory::getUserId, userIds);
+        } else { // 员工
+            wrapper.eq(Inventory::getUserId, userId); // 只能看到自己的库存预警
+        }
+        
         wrapper.isNotNull(Inventory::getWarningThreshold);
         wrapper.apply("quantity <= warning_threshold");
         wrapper.orderByDesc(Inventory::getUpdateTime);
@@ -88,6 +130,31 @@ public class InventoryService {
 
     public InventoryResp getById(Long id) {
         Inventory inventory = inventoryMapper.selectById(id);
+        if (inventory == null) {
+            return null;
+        }
+        
+        // 数据安全检查
+        Long userId = getCurrentUserId();
+        User currentUser = userMapper.selectById(userId);
+        
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            if (!userIds.contains(inventory.getUserId())) {
+                return null;
+            }
+        } else { // 员工
+            if (!inventory.getUserId().equals(userId)) {
+                return null;
+            }
+        }
+        
         return convertToResp(inventory);
     }
 

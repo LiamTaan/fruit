@@ -27,6 +27,8 @@ public class OutboundOrderResp {
     private BigDecimal profit;
     private Integer paymentType;
     private String paymentTypeName;
+    private Long operatorId;
+    private String operatorName;
     private String remark;
     private LocalDateTime createTime;
     private LocalDateTime outboundTime;

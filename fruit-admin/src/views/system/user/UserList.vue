@@ -34,15 +34,17 @@
         <el-table-column prop="username" label="用户名" />
         <el-table-column prop="nickname" label="昵称" />
         <el-table-column prop="phone" label="手机号" />
-        <el-table-column prop="role" label="角色">
+        <el-table-column prop="role" label="角色" width="100">
           <template #default="scope">
-            <el-tag v-if="scope.row.role === 1" type="success">管理员</el-tag>
-            <el-tag v-else type="info">普通用户</el-tag>
+            <el-tag v-if="scope.row.role === 1" type="primary">管理员</el-tag>
+            <el-tag v-else type="info">员工</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="parentId" label="所属管理员">
           <template #default="scope">
-            <span v-if="scope.row.parentId">管理员ID: {{ scope.row.parentId }}</span>
+            <span v-if="scope.row.parentId">
+              {{ adminMap[scope.row.parentId] || `管理员ID: ${scope.row.parentId}` }}
+            </span>
             <span v-else-if="scope.row.role === 1">-</span>
             <span v-else>未设置</span>
           </template>
@@ -99,6 +101,9 @@ const pagination = reactive({
   pageSize: 10,
   total: 0
 })
+
+// 管理员ID到用户名的映射
+const adminMap = ref({})
 
 // 获取当前登录用户信息
 const getCurrentUserInfo = () => {
@@ -197,7 +202,26 @@ const handleCurrentChange = (current) => {
   loadUserList()
 }
 
+// 加载管理员列表并构建映射
+const loadAdminMap = async () => {
+  try {
+    const admins = await userApi.getAdminList()
+    
+    // 构建管理员ID到用户名的映射
+    const map = {}
+    admins.forEach(admin => {
+      map[admin.id] = admin.nickname || admin.username
+    })
+    
+    adminMap.value = map
+  } catch (error) {
+    console.error('获取管理员列表失败:', error)
+    ElMessage.error('获取管理员列表失败，请稍后重试')
+  }
+}
+
 onMounted(() => {
+  loadAdminMap()
   loadUserList()
 })
 </script>

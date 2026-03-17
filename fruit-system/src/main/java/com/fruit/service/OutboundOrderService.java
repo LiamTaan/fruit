@@ -28,6 +28,7 @@ public class OutboundOrderService {
     private final ProductMapper productMapper;
     private final InventoryMapper inventoryMapper;
     private final DebtMapper debtMapper;
+    private final UserMapper userMapper;
 
     private Long getCurrentUserId() {
         return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -37,8 +38,26 @@ public class OutboundOrderService {
         Long userId = getCurrentUserId();
         Page<OutboundOrder> page = new Page<>(pageNum, pageSize);
         
+        // 获取当前用户信息
+        User currentUser = userMapper.selectById(userId);
+        
         LambdaQueryWrapper<OutboundOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(OutboundOrder::getUserId, userId);
+        
+        // 实现业务数据的隔离：
+        // - 管理员可以看到自己和下属员工创建的出库单
+        // - 员工只能看到自己创建的出库单
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            wrapper.in(OutboundOrder::getUserId, userIds);
+        } else { // 员工
+            wrapper.eq(OutboundOrder::getUserId, userId); // 只能看到自己创建的出库单
+        }
         
         // 根据isDebt参数过滤，1-现款，2-欠款
         if (isDebt != null) {
@@ -83,6 +102,28 @@ public class OutboundOrderService {
         if (order == null) {
             throw new BusinessException("出库单不存在");
         }
+        
+        // 数据安全检查
+        Long userId = getCurrentUserId();
+        User currentUser = userMapper.selectById(userId);
+        
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            if (!userIds.contains(order.getUserId())) {
+                throw new BusinessException("无权查看该出库单");
+            }
+        } else { // 员工
+            if (!order.getUserId().equals(userId)) {
+                throw new BusinessException("无权查看该出库单");
+            }
+        }
+        
         return convertToResp(order);
     }
 
@@ -101,9 +142,10 @@ public class OutboundOrderService {
             throw new BusinessException("果品不存在");
         }
         
+        // 根据产品创建者查询对应的库存
         LambdaQueryWrapper<Inventory> invWrapper = new LambdaQueryWrapper<>();
         invWrapper.eq(Inventory::getProductId, product.getId());
-        invWrapper.eq(Inventory::getUserId, userId);
+        invWrapper.eq(Inventory::getUserId, product.getUserId()); // 使用产品创建者的ID查询库存
         Inventory inventory = inventoryMapper.selectOne(invWrapper);
         if (inventory == null || inventory.getQuantity().compareTo(req.getWeight()) < 0) {
             throw new BusinessException("库存不足");
@@ -171,15 +213,23 @@ public class OutboundOrderService {
             resp.setUnit(product.getUnit());
         }
         
+        // 获取操作人昵称
+        if (order.getOperatorId() != null) {
+            User operator = userMapper.selectById(order.getOperatorId());
+            if (operator != null) {
+                resp.setOperatorName(operator.getUsername());
+            }
+        }
+        
         // 计算成本单价
         if (order.getCostAmount() != null && order.getWeight() != null && order.getWeight().compareTo(BigDecimal.ZERO) > 0) {
             // 成本单价 = 成本金额 / 重量
             resp.setCostPrice(order.getCostAmount().divide(order.getWeight(), 2, BigDecimal.ROUND_HALF_UP));
-        } else {
-            // 从库存中获取成本单价
+        } else if (product != null) {
+            // 从库存中获取成本单价，使用产品创建者的ID
             LambdaQueryWrapper<Inventory> invWrapper = new LambdaQueryWrapper<>();
             invWrapper.eq(Inventory::getProductId, order.getProductId());
-            invWrapper.eq(Inventory::getUserId, order.getUserId());
+            invWrapper.eq(Inventory::getUserId, product.getUserId()); // 使用产品创建者的ID
             Inventory inventory = inventoryMapper.selectOne(invWrapper);
             if (inventory != null) {
                 resp.setCostPrice(inventory.getCostPrice());

@@ -41,14 +41,20 @@ public class ProductService {
         
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
         
-        // 实现产品目录的部分共享：
+        // 实现产品目录的共享：
         // - 员工可以看到自己和所属管理员创建的产品
-        // - 管理员只能看到自己创建的产品
+        // - 管理员可以看到自己和下属员工创建的产品
         if (currentUser.getRole() == 2) { // 员工
             wrapper.and(w -> w.eq(Product::getUserId, userId) // 自己创建的
                             .or().eq(Product::getUserId, currentUser.getParentId())); // 所属管理员创建的
         } else { // 管理员
-            wrapper.eq(Product::getUserId, userId); // 只能看到自己创建的
+            // 管理员可以看到自己和下属员工的产品
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            wrapper.in(Product::getUserId, userIds);
         }
         
         // 关键词搜索
@@ -78,14 +84,20 @@ public class ProductService {
         
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
         
-        // 实现产品目录的部分共享：
+        // 实现产品目录的共享：
         // - 员工可以看到自己和所属管理员创建的产品
-        // - 管理员只能看到自己创建的产品
+        // - 管理员可以看到自己和下属员工创建的产品
         if (currentUser.getRole() == 2) { // 员工
             wrapper.and(w -> w.eq(Product::getUserId, userId) // 自己创建的
                             .or().eq(Product::getUserId, currentUser.getParentId())); // 所属管理员创建的
         } else { // 管理员
-            wrapper.eq(Product::getUserId, userId); // 只能看到自己创建的
+            // 管理员可以看到自己和下属员工的产品
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            wrapper.in(Product::getUserId, userIds);
         }
         
         wrapper.orderByDesc(Product::getCreateTime);
@@ -107,13 +119,20 @@ public class ProductService {
         
         // 数据安全检查：
         // - 员工只能访问自己和所属管理员创建的产品
-        // - 管理员只能访问自己创建的产品
+        // - 管理员可以访问自己和下属员工创建的产品
         if (currentUser.getRole() == 2) { // 员工
             if (!product.getUserId().equals(userId) && !product.getUserId().equals(currentUser.getParentId())) {
                 throw new BusinessException("无权访问该果品");
             }
         } else { // 管理员
-            if (!product.getUserId().equals(userId)) {
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            if (!userIds.contains(product.getUserId())) {
                 throw new BusinessException("无权访问该果品");
             }
         }

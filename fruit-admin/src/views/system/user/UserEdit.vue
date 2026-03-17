@@ -25,9 +25,15 @@
         </el-form-item>
         
         <el-form-item label="角色" prop="role">
-          <el-select v-model="userForm.role" placeholder="请选择角色">
+          <el-select v-model="userForm.role" placeholder="请选择角色" @change="handleRoleChange">
             <el-option label="管理员" value="1" />
-            <el-option label="普通用户" value="2" />
+            <el-option label="员工" value="2" />
+          </el-select>
+        </el-form-item>
+        
+        <el-form-item label="所属管理员" prop="parentId">
+          <el-select v-model="userForm.parentId" placeholder="请选择所属管理员" :disabled="userForm.role === '1'">
+            <el-option v-for="admin in adminList" :key="admin.id" :label="admin.nickname || admin.username" :value="admin.id" />
           </el-select>
         </el-form-item>
         
@@ -65,6 +71,9 @@ const route = useRoute()
 const userFormRef = ref()
 const userId = route.params.id
 
+// 管理员列表
+const adminList = ref([])
+
 // 表单数据
 const userForm = reactive({
   id: userId,
@@ -73,7 +82,8 @@ const userForm = reactive({
   phone: '',
   password: '', // 密码可选，不修改请留空
   role: '',
-  status: ''
+  status: '',
+  parentId: ''
 })
 
 // 表单验证规则
@@ -112,10 +122,19 @@ const loadUserInfo = async () => {
     userForm.phone = response.phone
     userForm.role = response.role
     userForm.status = response.status
+    userForm.parentId = response.parentId || ''
   } catch (error) {
     console.error('获取用户详情失败:', error)
     ElMessage.error('获取用户详情失败，请稍后重试')
     router.push('/system/user')
+  }
+}
+
+// 处理角色变化
+const handleRoleChange = (value) => {
+  if (value === '1') {
+    // 当角色为管理员时，清空所属管理员字段
+    userForm.parentId = null
   }
 }
 
@@ -148,9 +167,21 @@ const handleCancel = () => {
   router.push('/system/user')
 }
 
-// 组件挂载时加载用户信息
+// 加载管理员列表
+const loadAdminList = async () => {
+  try {
+    const admins = await userApi.getAdminList()
+    adminList.value = admins
+  } catch (error) {
+    console.error('获取管理员列表失败:', error)
+    ElMessage.error('获取管理员列表失败，请稍后重试')
+  }
+}
+
+// 组件挂载时加载用户信息和管理员列表
 onMounted(() => {
   loadUserInfo()
+  loadAdminList()
 })
 </script>
 

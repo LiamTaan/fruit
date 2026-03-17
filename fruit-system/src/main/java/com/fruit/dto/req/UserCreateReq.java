@@ -25,7 +25,7 @@ public class UserCreateReq {
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
 
-    private Integer role = 2; // 默认普通用户
+    private Integer role = 2; // 默认员工
     private Integer status = 1; // 默认启用
     private Long parentId; // 上级用户ID（老板ID）
 }

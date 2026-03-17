@@ -64,6 +64,10 @@
           <text class="footer-label">出库时间：</text>
           <text class="footer-value">{{item.outboundTime}}</text>
         </view>
+        <view class="footer-item" wx:if="{{item.operatorName}}">
+          <text class="footer-label">操作人：</text>
+          <text class="footer-value">{{item.operatorName}}</text>
+        </view>
       </view>
     </view>
   </view>

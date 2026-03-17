@@ -10,6 +10,14 @@ export const userApi = {
     })
   },
   
+  // 获取管理员列表
+  getAdminList: () => {
+    return request({
+      url: '/user/admins',
+      method: 'get'
+    })
+  },
+  
   // 获取用户详情
   getUserDetail: (id) => {
     return request({

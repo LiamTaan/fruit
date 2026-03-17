@@ -21,6 +21,8 @@ public class InboundOrderResp {
     private BigDecimal weight;
     private BigDecimal unitPrice;
     private BigDecimal totalAmount;
+    private Long operatorId;
+    private String operatorName;
     private String origin;
     private String remark;
     private LocalDateTime createTime;

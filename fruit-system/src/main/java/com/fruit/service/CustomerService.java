@@ -93,6 +93,28 @@ public class CustomerService {
         if (customer == null) {
             throw new BusinessException("客户不存在");
         }
+        
+        // 数据安全检查
+        Long userId = getCurrentUserId();
+        User currentUser = userMapper.selectById(userId);
+        
+        if (currentUser.getRole() == 1) { // 管理员
+            // 查询管理员自己和下属员工的ID列表
+            LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
+            userWrapper.and(w -> w.eq(User::getId, userId) // 管理员自己
+                               .or().eq(User::getParentId, userId)); // 下属员工
+            List<User> users = userMapper.selectList(userWrapper);
+            List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+            
+            if (!userIds.contains(customer.getUserId())) {
+                throw new BusinessException("无权查看该客户");
+            }
+        } else { // 员工
+            if (!customer.getUserId().equals(userId)) {
+                throw new BusinessException("无权查看该客户");
+            }
+        }
+        
         return convertToResp(customer);
     }
 

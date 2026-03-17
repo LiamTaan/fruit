@@ -60,6 +60,10 @@
         <view class="info-label">创建时间</view>
         <view class="info-value">{{order.createTime}}</view>
       </view>
+      <view class="info-row" wx:if="{{order.operatorName}}">
+        <view class="info-label">操作人</view>
+        <view class="info-value">{{order.operatorName}}</view>
+      </view>
     </view>
   </view>
 </view>

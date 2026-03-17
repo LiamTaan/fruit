@@ -6,7 +6,7 @@
       </view>
       <view class="user-detail">
         <view class="user-nickname">{{userInfo.nickname || userInfo.username || '未登录'}}</view>
-        <view class="user-role text-secondary">{{userInfo.role === 1 ? '管理员' : '普通用户'}}</view>
+        <view class="user-role text-secondary">{{userInfo.role === 1 ? '管理员' : '员工'}}</view>
       </view>
     </view>
   </view>
